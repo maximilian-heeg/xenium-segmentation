@@ -1,0 +1,6 @@
+.directory
+singularity/
+work/
+results/
+transcripts.csv
+.nextflow*
