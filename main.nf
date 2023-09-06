@@ -21,7 +21,7 @@ process getImageSize {
 
 process nuclearSegmentation {
   cpus { 12 * task.attempt }
-  memory { 10.GB + (1.GB * Math.round(BYTES.toInteger() / 1000 / 1000 / 1000 * 5) *  task.attempt ) } 
+  memory { 10.GB + (1.GB * Math.round(BYTES.toLong()/ 1000 / 1000 / 1000 * 5) *  task.attempt ) } 
   time { 8.hour * task.attempt }
   publishDir "$params.outdir", mode: 'copy', overwrite: true
   input:
