@@ -1,6 +1,7 @@
 .directory
 singularity/
 work/
+data/
 results/
 transcripts.csv
 .nextflow*
