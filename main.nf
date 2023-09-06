@@ -159,7 +159,7 @@ process dumpParameters {
 
 workflow {
   XENIUM =  Channel.fromPath( params.xenium_path, type: 'dir')
-  CELLPOSE_MODEL = file("$baseDir/dataset/sequences.fa")
+  CELLPOSE_MODEL = file("$baseDir/models/DAPI")
   
   size = getImageSize(XENIUM)
 
