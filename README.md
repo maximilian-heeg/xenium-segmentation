@@ -72,7 +72,7 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     /*********************************
     Merging
     *********************************/
-    // Threshold for stitching. If the IOU for two cells is greater that the threshold, they will be merged
+    // Threshold for stitching. If the IOU for two cells is greater than the threshold, they will be merged
     merge.iou_threshold = 0.2
 
 
