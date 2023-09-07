@@ -24,6 +24,8 @@ process nuclearSegmentation {
   memory { 10.GB + (1.GB * Math.round(BYTES.toLong()/ 1000 / 1000 / 1000 * 5) *  task.attempt ) } 
   time { 8.hour * task.attempt }
   publishDir "$params.outdir", mode: 'copy', overwrite: true
+  errorStrategy 'retry'
+  maxRetries 3
   input:
     path ''
     path 'models/DAPI'
