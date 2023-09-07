@@ -55,12 +55,12 @@ process tileXenium {
 
   """
     tile-xenium transcripts.csv \
-        --width $params.width \
-        --height $params.height \
-        --overlap $params.overlap\
-        --min-qv $params.qv\
+        --width $params.tile.width \
+        --height $params.tile.height \
+        --overlap $params.tile.overlap\
+        --min-qv $params.tile.qv\
         --out-dir out/ \
-        --minimal-transcripts $params.minimal_transcripts_per_tile
+        --minimal-transcripts $params.tile.minimal_transcripts
   """
 }
 
@@ -96,11 +96,11 @@ process Baysor {
         -y y_location\
         -z z_location \
         -g feature_name \
-        --min-molecules-per-cell $params.min_molecules_per_cell \
+        --min-molecules-per-cell $params.baysor.min_molecules_per_cell \
         -o out/ \
         -p \
-        --scale $params.scale \
-        --prior-segmentation-confidence $params.prior_segmentation_confidence \
+        --scale $params.baysor.scale \
+        --prior-segmentation-confidence $params.baysor.prior_segmentation_confidence \
         transcripts.csv \
         :cell_id
 
@@ -119,7 +119,7 @@ process mergeTiles {
 
     """
     merge-baysor *transcripts.csv \
-        --threshold $params.merge_threshold \
+        --threshold $params.merge.iou_threshold \
         --additional-columns x\
         --additional-columns y\
         --additional-columns z\
@@ -141,17 +141,24 @@ process dumpParameters {
   cat > parameter.txt << EOF
   # Parameters
 
-  ## Input 
+  ## Input / Outout
   - xenium_path: $params.xenium_path
+  - outdir: $params.outdir
+
+  ## Tile creation
+  - width: $params.tile.width
+  - height: $params.tile.height
+  - overlap: $params.tile.overlap
+  - minimal_transcripts: $params.tile.minimal_transcripts
 
   ## Baysor
-  - min_molecules_per_cell: $params.min_molecules_per_cell
-  - scale: $params.scale
-  - prior_segmentation_confidence: $params.prior_segmentation_confidence
+  - min_molecules_per_cell: $params.baysor.min_molecules_per_cell
+  - scale: $params.baysor.scale
+  - prior_segmentation_confidence: $params.baysor.prior_segmentation_confidence
 
   ## Merging
-  - merge_threshold: $params.merge_threshold
-  - outdir: $params.outdir
+  - merge_threshold: $params.merge.iou_threshold
+  
 
   EOF
   """
