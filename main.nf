@@ -43,8 +43,6 @@ process nuclearSegmentation {
   """
 }
 
-
-
 process tileXenium {
   cpus 8
   memory { 10.GB * task.attempt }
@@ -78,6 +76,29 @@ process getNumberOfTranscripts {
 
 }
 
+
+process createBaysorConfig {
+    output:
+      path "config.toml"
+
+    """
+    cat > config.toml << EOF
+    [data]
+    x = "x_location"
+    y = "y_location"
+    z = "z_location"
+    gene = "feature_name"
+    min_molecules_per_cell = $params.baysor.min_molecules_per_cell 
+  
+    [segmentation]
+    scale = $params.baysor.scale
+    prior_segmentation_confidence = $params.baysor.prior_segmentation_confidence
+    new_component_weight = $params.baysor.new_component_weight
+    EOF
+    """
+}
+
+
 process Baysor {
     cpus 8
     // Calcutelate the required memory dynamically based on the number of transcripts
@@ -88,24 +109,19 @@ process Baysor {
     maxRetries 3
     input:
         tuple val(TRANSCRIPTS), path("transcripts.csv")
+        path "config.toml"
     output:
         path "out/segmentation.csv"
 
     """
     mkdir out
+
     JULIA_NUM_THREADS=$task.cpus baysor run \
-        -x x_location\
-        -y y_location\
-        -z z_location \
-        -g feature_name \
-        --min-molecules-per-cell $params.baysor.min_molecules_per_cell \
+        -c config.toml \
         -o out/ \
         -p \
-        --scale $params.baysor.scale \
-        --prior-segmentation-confidence $params.baysor.prior_segmentation_confidence \
         transcripts.csv \
-        :cell_id
-
+        :cell_id \
     """
 }
 
@@ -133,6 +149,22 @@ process mergeTiles {
     """
 }
 
+process diagnosticPlots {
+  input:
+    path "data/transcripts.csv"
+    path "data/transcripts_cellpose.csv"
+  output:
+    path 'diagnostics.html'
+  publishDir "$params.outdir", mode: 'copy', overwrite: true
+
+  """
+    cp $baseDir/scripts/diagnostics.ipynb  .
+    jupyter nbconvert \
+      --execute \
+      --to html \
+      diagnostics.ipynb   
+  """
+}
 
 process dumpParameters {
   publishDir "$params.outdir", mode: 'copy', overwrite: true
@@ -160,8 +192,6 @@ process dumpParameters {
 
   ## Merging
   - merge_threshold: $params.merge.iou_threshold
-  
-
   EOF
   """
 }
@@ -171,15 +201,20 @@ workflow {
   CELLPOSE_MODEL = file("$baseDir/models/DAPI")
   
   size = getImageSize(XENIUM)
+  baysor_config = createBaysorConfig()
 
-  nuclearSegmentation(XENIUM, CELLPOSE_MODEL, size) \
-  | tileXenium \
+  nuclear_segmentation = nuclearSegmentation(XENIUM, CELLPOSE_MODEL, size)
+
+  baysor_segmentation = tileXenium(nuclear_segmentation) \
   | flatten \
-  | filter{ it.size()>0 } \
-  | getNumberOfTranscripts \
-  | Baysor \
+  | filter{ it.size()>0 }
+  | getNumberOfTranscripts
+  
+  baysor_segmentation = Baysor(baysor_segmentation, baysor_config)
   | collect \
   | mergeTiles
+
+  diagnosticPlots(baysor_segmentation, nuclear_segmentation)
 
   dumpParameters()
 }
