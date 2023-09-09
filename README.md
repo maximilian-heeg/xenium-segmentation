@@ -37,7 +37,8 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     tile.width = 4000 
     // The height of a tile
     tile.height = 4000
-    // The overlap between titles. The next tile with start at x + width - overlap, or y + height - overlap
+    // The overlap between titles. The next tile with start at x + width - overlap, 
+    // or y + height - overlap
     tile.overlap = 200
     // The minimum Q-Score to pass filtering. 
     tile.qv = 20
@@ -72,7 +73,8 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     /*********************************
     Merging
     *********************************/
-    // Threshold for stitching. If the IOU for two cells is greater than the threshold, they will be merged
+    // Threshold for stitching. If the IOU for two cells is greater than 
+    // the threshold, they will be merged
     merge.iou_threshold = 0.2
 
 
