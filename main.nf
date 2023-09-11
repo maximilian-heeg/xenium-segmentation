@@ -92,6 +92,7 @@ process createBaysorConfig {
   
     [segmentation]
     scale = $params.baysor.scale
+    scale_std = "$params.baysor.scale_std"
     prior_segmentation_confidence = $params.baysor.prior_segmentation_confidence
     new_component_weight = $params.baysor.new_component_weight
     EOF

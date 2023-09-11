@@ -63,6 +63,11 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // Negative values mean it must be estimated from `min_molecules_per_cell`
     baysor.scale = -1.0
 
+    // Standard deviation of scale across cells. Can be either number, which
+    // means absolute value of the std, or string ended with "%" to set it 
+    // relative to scale. Default: "25%"
+    baysor.scale_std = "25%"
+
     // Confidence of the prior_segmentation results.
     // Value in [0; 1]. If you want the final segmentation not
     // contradicting to prior_segmentation, set it to 1.
