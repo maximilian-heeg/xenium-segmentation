@@ -3,7 +3,7 @@
 
 process getImageSize {
   input:
-    path ''
+    path 'data'
   output:
     stdout
   script:
@@ -27,7 +27,7 @@ process nuclearSegmentation {
   errorStrategy 'retry'
   maxRetries 3
   input:
-    path ''
+    path 'data'
     path 'models/DAPI'
     val BYTES
   output:
@@ -150,30 +150,12 @@ process mergeTiles {
     """
 }
 
-process diagnosticPlots {
-  input:
-    path "data/transcripts.csv"
-    path "data/transcripts_cellpose.csv"
-  output:
-    path 'diagnostics.html'
-  publishDir "$params.outdir", mode: 'copy', overwrite: true
-
-  """
-    cp $baseDir/scripts/diagnostics.ipynb  .
-    jupyter nbconvert \
-      --execute \
-      --to html \
-      diagnostics.ipynb   
-  """
-}
-
 process dumpParameters {
-  publishDir "$params.outdir", mode: 'copy', overwrite: true
   output:
-    path "parameter.txt"
+    path "parameter.md"
 
   """
-  cat > parameter.txt << EOF
+  cat > parameter.md << EOF
   # Parameters
 
   ## Input / Outout
@@ -197,7 +179,27 @@ process dumpParameters {
   """
 }
 
+process generateReport {
+  input:
+    path 'data/xenium'
+    path "data/transcripts.csv"
+    path "data/transcripts_cellpose.csv"
+    path "parameter.md"
+  output:
+    path 'book/*'
+  publishDir "$params.outdir", mode: 'copy', overwrite: true
+
+  """
+    cp -r $baseDir/scripts/diagnostics/*  .
+    jupyter-book build .
+    mkdir book
+    cp -r _build/html/* book/
+  """
+}
+
+
 workflow {
+
   XENIUM =  Channel.fromPath( params.xenium_path, type: 'dir')
   CELLPOSE_MODEL = file("$baseDir/models/DAPI")
   
@@ -215,7 +217,7 @@ workflow {
   | collect \
   | mergeTiles
 
-  diagnosticPlots(baysor_segmentation, nuclear_segmentation)
+  parameter = dumpParameters()
 
-  dumpParameters()
+  generateReport(XENIUM, baysor_segmentation, nuclear_segmentation, parameter)
 }

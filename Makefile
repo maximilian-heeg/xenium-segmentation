@@ -18,7 +18,7 @@ test2:
 		--tile.width 600 \
 		--baysor.prior_segmentation_confidence 1\
 		--baysor.min_molecules_per_cell 100 \
-		--outdir results/test
+		--outdir results/test2
 
 test3:
 	nextflow run main.nf \
@@ -28,7 +28,7 @@ test3:
 		--baysor.prior_segmentation_confidence 1\
 		--baysor.scale_std 50%\
 		--baysor.min_molecules_per_cell 100 \
-		--outdir results/test
+		--outdir results/test3
 
 test4:
 	nextflow run main.nf \
@@ -36,9 +36,10 @@ test4:
 		--xenium_path data \
 		--tile.width 600 \
 		--baysor.prior_segmentation_confidence 1\
-		--baysor.scale_std 80%\
+		--baysor.scale_std 50%\
+		--baysor.new_component_weight 0.01\
 		--baysor.min_molecules_per_cell 100 \
-		--outdir results/test
+		--outdir results/test4
 
 cleantest: clean test
 

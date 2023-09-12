@@ -75,6 +75,21 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // values in [0.2-0.7] allow flexibility for the algorithm.
     baysor.prior_segmentation_confidence = 0.5
 
+    // new-component-weight is proportional to the probability of 
+    // generating a new cell for a molecule, instead of assigning 
+    // it to one of the existing cells. More precisely, the probability 
+    // to assign a molecule to a particular cell linearly depends on 
+    // the number of molecules, already assigned to this cell. And this
+    // parameter is used as the number of molecules for a cell, which is
+    // just generated for this new molecule. The algorithm is robust to
+    // small changes in this parameter. And normally values in the range
+    // of 0.1-0.9 should work fine. Smaller values would lead to slower
+    // convergence of the algorithm, while larger values force the 
+    // emergence of a large number of small cells on each iteration, 
+    // which can produce noise in the result. In general, the default 
+    // value should work well.
+    baysor.new_component_weight = 0.2
+
     /*********************************
     Merging
     *********************************/
