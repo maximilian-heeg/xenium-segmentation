@@ -171,7 +171,9 @@ process dumpParameters {
   ## Baysor
   - min_molecules_per_cell: $params.baysor.min_molecules_per_cell
   - scale: $params.baysor.scale
+  - scale_std: $baysor.scale_std
   - prior_segmentation_confidence: $params.baysor.prior_segmentation_confidence
+  - new_component_weight: $params.baysor.new_component_weight
 
   ## Merging
   - merge_threshold: $params.merge.iou_threshold
