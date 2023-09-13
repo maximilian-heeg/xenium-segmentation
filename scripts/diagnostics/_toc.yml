@@ -2,6 +2,7 @@ format: jb-book
 root: diagnostics
 chapters:
 - file: boundaries
+- file: evaluation
 - file: parameter
 
 
