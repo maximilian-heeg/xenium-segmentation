@@ -97,6 +97,20 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // the threshold, they will be merged
     merge.iou_threshold = 0.2
 
+    /*********************************
+    Report
+    *********************************/
+    // Width in px of the boundary plot
+    report.width = 1800
+    // Height in px of the boundary plot
+    report.height = 1600
+    // X offset in px of the FOV that is beeing used for 
+    // the plot (-1: center FOV)
+    report.x_offset = -1
+    // y offset in px of the FOV that is beeing used for 
+    // the plot (-1: center FOV)
+    report.y_offset = -1
+
 
 These parameters can either be changed by adding the parameters to the command (`--baysor.min_molecules_per_cell 60`) or by creating a `nextflow.config` file within the working directory.
 

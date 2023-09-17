@@ -199,6 +199,11 @@ process generateReport {
   publishDir "$params.outdir", mode: 'copy', overwrite: true
 
   """
+    export WIDTH=$params.report.width
+    export HEIGHT=$params.report.height
+    export X_OFFSET=$params.report.x_offset
+    export Y_OFFSET=$params.report.y_offset
+
     cp -r $baseDir/scripts/diagnostics/*  .
     jupyter-book build .
     mkdir book
