@@ -179,6 +179,12 @@ process dumpParameters {
 
   ## Merging
   - merge_threshold: $params.merge.iou_threshold
+
+  ## Report
+  -  report.width = $params.report.width
+  -  report.height = $params.report.height
+  -  report.x_offset = $params.report.x_offset
+  -  report.y_offset = $params.report.y_offset
   EOF
   """
 }

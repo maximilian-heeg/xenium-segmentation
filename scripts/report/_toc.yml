@@ -3,7 +3,7 @@ root: diagnostics
 chapters:
 - file: boundaries
 - file: evaluation
-- file: parameter
 - file: scanpy
+- file: parameter
 
 
