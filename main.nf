@@ -195,7 +195,8 @@ process generateReport {
     path "data/transcripts_cellpose.csv"
     path "parameter.md"
   output:
-    path 'book/*'
+    path 'report/*'
+    path 'anndata.h5ad'
   publishDir "$params.outdir", mode: 'copy', overwrite: true
 
   """
@@ -204,10 +205,10 @@ process generateReport {
     export X_OFFSET=$params.report.x_offset
     export Y_OFFSET=$params.report.y_offset
 
-    cp -r $baseDir/scripts/diagnostics/*  .
+    cp -r $baseDir/scripts/report/*  .
     jupyter-book build .
-    mkdir book
-    cp -r _build/html/* book/
+    mkdir report
+    cp -r _build/html/* report/
   """
 }
 

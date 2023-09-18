@@ -4,5 +4,6 @@ chapters:
 - file: boundaries
 - file: evaluation
 - file: parameter
+- file: scanpy
 
 
