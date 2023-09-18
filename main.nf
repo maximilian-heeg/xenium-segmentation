@@ -186,7 +186,7 @@ process dumpParameters {
 process generateReport {
   cpus 8
   memory { 20.GB * task.attempt }
-  time { 2.hour * task.attempt }
+  time { 4.hour * task.attempt }
   errorStrategy 'retry'
   maxRetries 3
   input:
