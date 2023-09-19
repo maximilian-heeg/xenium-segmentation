@@ -221,7 +221,7 @@ process generateReport {
 
 workflow {
 
-  XENIUM =  Channel.fromPath( params.xenium_path, type: 'dir')
+  XENIUM =  Channel.fromPath( params.xenium_path, type: 'dir', checkIfExists: true)
   CELLPOSE_MODEL = file("$baseDir/models/DAPI")
   
   size = getImageSize(XENIUM)
