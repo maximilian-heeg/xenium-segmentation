@@ -4,6 +4,6 @@ chapters:
 - file: boundaries
 - file: evaluation
 - file: scanpy
+- file: segmentation
+- file: baysor_config
 - file: parameter
-
-

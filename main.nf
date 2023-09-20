@@ -1,244 +1,44 @@
 // Nextflow pipeline for 10x segmentation
 
-
-process getImageSize {
-  input:
-    path 'data'
-  output:
-    stdout
-  script:
-  """
-    #!/usr/bin/env python
-    import tifffile
-
-    tif = tifffile.TiffFile('data/morphology_mip.ome.tif')
-    page = tif.pages[0]  # get shape and dtype of image in first page
-    pixel = page.shape[0] * page.shape[1]
-    bytes = pixel * 16
-    print(bytes)
-  """
-}
-
-process nuclearSegmentation {
-  cpus { 12 * task.attempt }
-  memory { 10.GB + (1.GB * Math.round(BYTES.toLong()/ 1000 / 1000 / 1000 * 5) *  task.attempt ) } 
-  time { 8.hour * task.attempt }
-  publishDir "$params.outdir", mode: 'copy', overwrite: true
-  errorStrategy 'retry'
-  maxRetries 3
-  input:
-    path 'data'
-    path 'models/DAPI'
-    val BYTES
-  output:
-    path 'transcripts_cellpose.csv'
-
-
-  """
-    cp $baseDir/scripts/nuclear_segmentation.ipynb  .
-    jupyter nbconvert \
-      --execute \
-      --to html \
-      nuclear_segmentation.ipynb   
-  """
-}
-
-process tileXenium {
-  cpus 8
-  memory { 10.GB * task.attempt }
-  time { 2.hour * task.attempt }
-  errorStrategy 'retry'
-  maxRetries 3
-  input:
-    path 'transcripts.csv'
-  output:
-    path 'out/X*.csv'
-
-
-  """
-    tile-xenium transcripts.csv \
-        --width $params.tile.width \
-        --height $params.tile.height \
-        --overlap $params.tile.overlap\
-        --min-qv $params.tile.qv\
-        --out-dir out/ \
-        --minimal-transcripts $params.tile.minimal_transcripts
-  """
-}
-
-
-process getNumberOfTranscripts {
-    input:
-        path 'transcripts.csv'
-    output:
-        tuple env(TRANSCRIPTS), path("transcripts.csv")
-    '''
-    TRANSCRIPTS=$(cat transcripts.csv | wc -l )
-    '''
-
-}
-
-
-process createBaysorConfig {
-    output:
-      path "config.toml"
-
-    """
-    cat > config.toml << EOF
-    [data]
-    x = "x_location"
-    y = "y_location"
-    z = "z_location"
-    gene = "feature_name"
-    min_molecules_per_cell = $params.baysor.min_molecules_per_cell 
-  
-    [segmentation]
-    scale = $params.baysor.scale
-    scale_std = "$params.baysor.scale_std"
-    prior_segmentation_confidence = $params.baysor.prior_segmentation_confidence
-    new_component_weight = $params.baysor.new_component_weight
-    EOF
-    """
-}
-
-
-process Baysor {
-    cpus 8
-    // Calcutelate the required memory dynamically based on the number of transcripts
-    // These values are estimates from the benchmarking that I did.
-    memory { 10.GB + (1.GB * Math.round(TRANSCRIPTS.toInteger()  / 1000000 * 20) *  task.attempt ) } 
-    time { 12.hour * task.attempt }
-    errorStrategy 'retry'
-    maxRetries 3
-    input:
-        tuple val(TRANSCRIPTS), path("transcripts.csv")
-        path "config.toml"
-    output:
-        path "out/segmentation.csv"
-
-    """
-    mkdir out
-
-    JULIA_NUM_THREADS=$task.cpus baysor run \
-        -c config.toml \
-        -o out/ \
-        -p \
-        transcripts.csv \
-        :cell_id \
-    """
-}
-
-process mergeTiles {
-    cpus 8
-    memory { 10.GB * task.attempt }
-    time { 2.hour * task.attempt }
-    publishDir "$params.outdir", mode: 'copy', overwrite: true
-    input:
-        path "*transcripts.csv"
-    output:
-        path "transcripts.csv"
-
-    """
-    merge-baysor *transcripts.csv \
-        --threshold $params.merge.iou_threshold \
-        --additional-columns x\
-        --additional-columns y\
-        --additional-columns z\
-        --additional-columns qv\
-        --additional-columns overlaps_nucleus\
-        --additional-columns gene\
-        --outfile transcripts.csv
-
-    """
-}
-
-process dumpParameters {
-  output:
-    path "parameter.md"
-
-  """
-  cat > parameter.md << EOF
-  # Parameters
-
-  ## Input / Outout
-  - xenium_path: $params.xenium_path
-  - outdir: $params.outdir
-
-  ## Tile creation
-  - width: $params.tile.width
-  - height: $params.tile.height
-  - overlap: $params.tile.overlap
-  - minimal_transcripts: $params.tile.minimal_transcripts
-
-  ## Baysor
-  - min_molecules_per_cell: $params.baysor.min_molecules_per_cell
-  - scale: $params.baysor.scale
-  - scale_std: $params.baysor.scale_std
-  - prior_segmentation_confidence: $params.baysor.prior_segmentation_confidence
-  - new_component_weight: $params.baysor.new_component_weight
-
-  ## Merging
-  - merge_threshold: $params.merge.iou_threshold
-
-  ## Report
-  -  report.width = $params.report.width
-  -  report.height = $params.report.height
-  -  report.x_offset = $params.report.x_offset
-  -  report.y_offset = $params.report.y_offset
-  EOF
-  """
-}
-
-process generateReport {
-  cpus 8
-  memory { 20.GB * task.attempt }
-  time { 4.hour * task.attempt }
-  errorStrategy 'retry'
-  maxRetries 3
-  input:
-    path 'data/xenium'
-    path "data/transcripts.csv"
-    path "data/transcripts_cellpose.csv"
-    path "parameter.md"
-  output:
-    path 'report/*'
-    path 'anndata.h5ad'
-  publishDir "$params.outdir", mode: 'copy', overwrite: true
-
-  """
-    export WIDTH=$params.report.width
-    export HEIGHT=$params.report.height
-    export X_OFFSET=$params.report.x_offset
-    export Y_OFFSET=$params.report.y_offset
-
-    cp -r $baseDir/scripts/report/*  .
-    jupyter-book build .
-    mkdir report
-    cp -r _build/html/* report/
-  """
-}
+include {Logo}                      from './modules/Logo'
+include {Baysor}                    from './modules/Baysor'
+include {NuclearSegmentation}       from './modules/NuclearSegmentation'
+include {Report}                    from './modules/Report'
 
 
 workflow {
+  Logo()
 
-  XENIUM =  Channel.fromPath( params.xenium_path, type: 'dir', checkIfExists: true)
-  CELLPOSE_MODEL = file("$baseDir/models/DAPI")
+  // Define input channels
+  ch_xenium_output =  Channel.fromPath( params.xenium_path, type: 'dir', checkIfExists: true)
+  ch_cellpose_model = file("$baseDir/models/DAPI")
+
   
-  size = getImageSize(XENIUM)
-  baysor_config = createBaysorConfig()
+  // Run nuclear segmentation
+  wf_nuclear_segmentation = NuclearSegmentation(
+      ch_xenium_output,
+      ch_cellpose_model
 
-  nuclear_segmentation = nuclearSegmentation(XENIUM, CELLPOSE_MODEL, size)
+  )
+  ch_nuclear_segmentation = wf_nuclear_segmentation.transcripts
+  ch_nuclear_segmentation_notebook = wf_nuclear_segmentation.notebook
 
-  baysor_segmentation = tileXenium(nuclear_segmentation) \
-  | flatten \
-  | filter{ it.size()>0 }
-  | getNumberOfTranscripts
-  
-  baysor_segmentation = Baysor(baysor_segmentation, baysor_config)
-  | collect \
-  | mergeTiles
 
-  parameter = dumpParameters()
+  // Run Baysor
+  wf_baysor_segmentation = Baysor (
+      ch_xenium_output, 
+      ch_nuclear_segmentation
+  )
+  ch_baysor_segmentation = wf_baysor_segmentation.transcripts
+  ch_baysor_config       = wf_baysor_segmentation.config
 
-  generateReport(XENIUM, baysor_segmentation, nuclear_segmentation, parameter)
+
+  // Create a report
+  Report(
+    ch_xenium_output,
+    ch_baysor_segmentation,
+    ch_nuclear_segmentation,
+    ch_nuclear_segmentation_notebook, 
+    ch_baysor_config
+  )
 }

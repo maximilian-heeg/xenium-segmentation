@@ -2,8 +2,6 @@ title: Segmentation diagnostics
 author: Maximilian Heeg
 logo: segmentation.svg
 execute:
-  execute_notebooks: force
+  execute_notebooks: off
   timeout: -1
 
-bibtex_bibfiles:
-  - references.bib

@@ -55,7 +55,19 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // Minimal number of molecules for a cell to be considered as
     // real. It's an important parameter, as it's used to infer
     // several other parameters. Overrides the config value.
-    baysor.min_molecules_per_cell = 30
+    // If set to -1, the pipeline will calcuate the median transcripts per cell based 
+    // on the 10x segmentation and use that value as min_molecules_per_cell
+    baysor.min_molecules_per_cell = -1
+
+    // If min_molecules_per_cell should be estimated, this values defines the fraction of 
+    // the median transcripts per cell that will be set as min_molecules_per_cell
+    baysor.min_molecules_per_cell_fraction = 0.75
+
+    // Minimal number of molecules in a segmented region, required for this region to be 
+    // considered as a possible cell.
+    // 0: min_molecules_per_cell / 4 (Baysor default)
+    // string ended with '%' to set it relative to min_molecules_per_cell
+    baysor.min_molecules_per_segment = '50%'
 
     // Standard deviation of scale across cells. Can be either
     // number, which means absolute value of the std, or string
