@@ -26,6 +26,7 @@ process create {
       val ch_scale_std
       val ch_prior_segmentation_confidence
       val ch_new_component_weight
+      val ch_n_clusters
     output:
       path "config.toml"
 
@@ -44,6 +45,9 @@ process create {
       [segmentation]
       scale = $ch_scale
       scale_std = "$ch_scale_std"
+      n_clusters = $ch_n_clusters
+      nuclei_genes = "$params.baysor.nuclei_genes"
+      cyto_genes   = "$params.baysor.cyto_genes"
       prior_segmentation_confidence = $ch_prior_segmentation_confidence
       new_component_weight = $ch_new_component_weight
       EOF
@@ -101,6 +105,7 @@ workflow BaysorConfig {
         ch_scale_std                      =  Channel.value(params.baysor.scale_std)
         ch_prior_segmentation_confidence  =  Channel.value(params.baysor.prior_segmentation_confidence)
         ch_new_component_weight           =  Channel.value(params.baysor.new_component_weight)
+        ch_n_clusters                     =  Channel.value(params.baysor.n_clusters)
 
         baysor_config = create (
           ch_min_molecules_per_cell,
@@ -108,7 +113,8 @@ workflow BaysorConfig {
           ch_scale,
           ch_scale_std,
           ch_prior_segmentation_confidence,
-          ch_new_component_weight
+          ch_new_component_weight,
+          ch_n_clusters
         )
 
     emit:

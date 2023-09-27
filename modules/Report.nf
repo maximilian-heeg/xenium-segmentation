@@ -24,7 +24,10 @@ process dumpParameters {
   - min_molecules_per_segment: $params.baysor.min_molecules_per_segment
   - scale: $params.baysor.scale
   - scale_std: $params.baysor.scale_std
+  - n_clusters: $params.baysor.n_clusters
   - prior_segmentation_confidence: $params.baysor.prior_segmentation_confidence
+  - nuclei_genes: $params.baysor.nuclei_genes
+  - cyto_genes: $params.baysor.cyto_genes
   - new_component_weight: $params.baysor.new_component_weight
 
   ## Merging
