@@ -1,45 +1,22 @@
-
+import groovy.json.JsonOutput
 
 process dumpParameters {
   output:
     path "parameter.md"
 
-  """
-  cat > parameter.md << EOF
-  # Parameters
+  
+  script:
+    json_str = JsonOutput.toJson(params)
+    json_indented = JsonOutput.prettyPrint(json_str)
+    """
+    cat > parameter.md << EOF
+# Parameters
 
-  ## Input / Output
-  - xenium_path: $params.xenium_path
-  - outdir: $params.outdir
-
-  ## Tile creation
-  - width: $params.tile.width
-  - height: $params.tile.height
-  - overlap: $params.tile.overlap
-  - minimal_transcripts: $params.tile.minimal_transcripts
-
-  ## Baysor
-  - min_molecules_per_cell: $params.baysor.min_molecules_per_cell
-  - min_molecules_per_cell_fraction: $params.baysor.min_molecules_per_cell_fraction
-  - min_molecules_per_segment: $params.baysor.min_molecules_per_segment
-  - scale: $params.baysor.scale
-  - scale_std: $params.baysor.scale_std
-  - n_clusters: $params.baysor.n_clusters
-  - prior_segmentation_confidence: $params.baysor.prior_segmentation_confidence
-  - nuclei_genes: $params.baysor.nuclei_genes
-  - cyto_genes: $params.baysor.cyto_genes
-  - new_component_weight: $params.baysor.new_component_weight
-
-  ## Merging
-  - merge_threshold: $params.merge.iou_threshold
-
-  ## Report
-  -  report.width = $params.report.width
-  -  report.height = $params.report.height
-  -  report.x_offset = $params.report.x_offset
-  -  report.y_offset = $params.report.y_offset
-  EOF
-  """
+\\`\\`\\`json
+  ${json_indented}
+\\`\\`\\`
+EOF
+    """
 }
 
 
@@ -152,9 +129,10 @@ process build {
   """
     cp -r $baseDir/scripts/report/*  .
 
-    echo "# Baysor config \n\n" > baysor_config.md
-    sed -e 's/^/     /' baysor.toml >> baysor_config.md
-
+    echo "# Baysor config \n\n\\`\\`\\`toml" > baysor_config.md
+    cat baysor.toml >> baysor_config.md
+    echo "\\`\\`\\`" >> baysor_config.md
+    
     jupyter-book build .
     mkdir report
     cp -r _build/html/* report/

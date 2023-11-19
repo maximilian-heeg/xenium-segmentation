@@ -1,7 +1,7 @@
 include {BaysorConfig}  from '../modules/BaysorConfig'
 
 process tileXenium {
-  container 'docker://maximilianheeg/tile-xenium:v0.1.1'
+  container 'docker://maximilianheeg/tile-xenium:v0.1.2'
   cpus 8
   memory { 10.GB * task.attempt }
   time { 2.hour * task.attempt }

@@ -41,6 +41,7 @@ process create {
       gene = "feature_name"
       min_molecules_per_cell = $ch_min_mollecules_per_cell
       min_molecules_per_segment = $ch_min_molecules_per_segment
+      exclude_genes = "$params.baysor.exclude_genes"
     
       [segmentation]
       scale = $ch_scale

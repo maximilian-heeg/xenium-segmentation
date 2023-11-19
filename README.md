@@ -98,6 +98,10 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // `nuclei-genes` has to be set, as well.
     cyto_genes = ""
 
+    // Comma-separated list of genes or regular expressions to ignore
+    // during segmentation. Example: 'Blank*,MALAT1'
+    baysor.exclude_genes = ""
+
     // new-component-weight is proportional to the probability of 
     // generating a new cell for a molecule, instead of assigning 
     // it to one of the existing cells. More precisely, the probability 
