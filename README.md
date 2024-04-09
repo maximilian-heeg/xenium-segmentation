@@ -16,7 +16,7 @@ A nextflow pipeline for segmentation of 10x Xenium runs. The pipeline consists o
 The pipeline requires a working installation of [nextflow](https://www.nextflow.io/). Further, it uses [singularity/apptainer](https://apptainer.org/) to run the scripts in reproducible environments.
 Run the pipeline with:
 
-    nextflow run maximilian-heeg/xenium-segmentaion -r v0.1.0 --xenium_path PATH_TO_XENIUM_OUTOUT
+    nextflow run maximilian-heeg/xenium-segmentation -r v0.1.0 --xenium_path PATH_TO_XENIUM_OUTOUT
 
 ### Parameters
 
