@@ -19,7 +19,7 @@ workflow Logo {
               __/ |                                                
              |___/  
 --------------------------------------------------------------------
-(c) Maximilian Heeg, 2023
+(c) Maximilian Heeg, 2023-2024
 https://github.com/maximilian-heeg/xenium-segmentation
 --------------------------------------------------------------------
 /$

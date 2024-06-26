@@ -1,7 +1,7 @@
 
 
 process getMedianTranscriptsPerCell {
-  container 'docker://maximilianheeg/docker-scanpy:v1.9.5'
+  container 'docker://maximilianheeg/docker-scanpy:v1.9.5_pyarrow'
   input:
     path 'data'
   output:
@@ -11,7 +11,7 @@ process getMedianTranscriptsPerCell {
     #!/usr/bin/env python
     
     import pandas as pd
-    df = pd.read_csv("data/transcripts.csv.gz")
+    df = pd.read_parquet("data/transcripts.parquet")
     result = df[~(df['cell_id'] == "UNASSIGNED")].groupby("cell_id").size().median()
     print(round(result))
   """

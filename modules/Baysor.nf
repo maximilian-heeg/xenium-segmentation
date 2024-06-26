@@ -8,13 +8,13 @@ process tileXenium {
   errorStrategy 'retry'
   maxRetries 3
   input:
-    path 'transcripts.csv'
+    path infile
   output:
     path 'out/X*.csv'
 
 
   """
-    tile-xenium transcripts.csv \
+    tile-xenium ${infile} \
         --width $params.tile.width \
         --height $params.tile.height \
         --overlap $params.tile.overlap\

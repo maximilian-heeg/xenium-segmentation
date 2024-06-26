@@ -2,8 +2,17 @@
 
 A nextflow pipeline for segmentation of 10x Xenium runs. The pipeline consists of the following parts:
 
-- Create a nuclear segmentation using the DAPI maximal intensity projection using a trained cellpose model. In our experience, this works slightly better that the nuclear segmentation that Xenium is running internally. See the [nuclear_segmentation.ipynb](https://github.com/maximilian-heeg/xenium-segmentation/blob/main/scripts/nuclear_segmentation.ipynb) notebook. Cellpose and all dependencies are wrapped in a [docker image](https://github.com/maximilian-heeg/docker-cellpose).
-- Assign transcripts to nucleus (or unassigned if not within a nucleus). 
+## Update v0.3:  June 2024
+
+The pipeline has been adjusted to use the files generated from Xenium running software version 3. The main changes are:
+
+- The pipeline no longer runs the custom nuclear segmentation, as the multimodal segmentation kit yields good results.
+- The results from the multimodal segmentation are now passed onto Baysor as a prior segmentation.
+- The scripts have been adapted to use the parquet files instead of csv files.
+
+
+## What is does...
+
 - Filter the transcripts based on OV values, remove non-gene transcripts and create smaller tiles of the dataset. For more information see [tile-xenium](https://github.com/maximilian-heeg/tile-xenium).
 - Run Baysor on all tiles. This step uses [Baysor](https://github.com/kharchenkolab/Baysor) wrapped in a [docker image](https://github.com/maximilian-heeg/baysor-container).
 - Merge the segmentation results to get one final segmentation. This [program](https://github.com/maximilian-heeg/merge-baysor) merges cells based on an IOU threshold.
@@ -165,3 +174,7 @@ process {
     queue = 'home-yeo'
 }
 </pre>
+
+### Troubleshooting
+
+Since Nextflow version 23.07.0, nextflow no longer mounts the home directory when launching a Singularity container. This can cause some errors with the cache directories in python scripts, but can be fixed by setting `export NXF_SINGULARITY_HOME_MOUNT=true`.

@@ -1,9 +1,7 @@
 format: jb-book
 root: diagnostics
 chapters:
-- file: boundaries
-- file: evaluation
 - file: scanpy
-- file: segmentation
+- file: boundaries
 - file: baysor_config
 - file: parameter

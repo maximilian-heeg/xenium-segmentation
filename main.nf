@@ -2,7 +2,6 @@
 
 include {Logo}                      from './modules/Logo'
 include {Baysor}                    from './modules/Baysor'
-include {NuclearSegmentation}       from './modules/NuclearSegmentation'
 include {Report}                    from './modules/Report'
 
 
@@ -11,23 +10,14 @@ workflow {
 
   // Define input channels
   ch_xenium_output =  Channel.fromPath( params.xenium_path, type: 'dir', checkIfExists: true)
-  ch_cellpose_model = file("$baseDir/models/DAPI")
+  ch_xenium_transcripts = Channel.fromPath( params.xenium_path + "/transcripts.parquet", checkIfExists: true)
 
-  
-  // Run nuclear segmentation
-  wf_nuclear_segmentation = NuclearSegmentation(
-      ch_xenium_output,
-      ch_cellpose_model
-
-  )
-  ch_nuclear_segmentation = wf_nuclear_segmentation.transcripts
-  ch_nuclear_segmentation_notebook = wf_nuclear_segmentation.notebook
 
 
   // Run Baysor
   wf_baysor_segmentation = Baysor (
       ch_xenium_output, 
-      ch_nuclear_segmentation
+      ch_xenium_transcripts
   )
   ch_baysor_segmentation = wf_baysor_segmentation.transcripts
   ch_baysor_config       = wf_baysor_segmentation.config
@@ -37,8 +27,7 @@ workflow {
   Report(
     ch_xenium_output,
     ch_baysor_segmentation,
-    ch_nuclear_segmentation,
-    ch_nuclear_segmentation_notebook, 
+    ch_xenium_transcripts,
     ch_baysor_config
   )
 }
