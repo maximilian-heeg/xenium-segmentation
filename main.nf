@@ -3,7 +3,7 @@
 include {Logo}                      from './modules/Logo'
 include {Baysor}                    from './modules/Baysor'
 include {Report}                    from './modules/Report'
-
+include {XeniumRanger}              from './modules/XeniumRanger'
 
 workflow {
   Logo()
@@ -21,6 +21,11 @@ workflow {
   )
   ch_baysor_segmentation = wf_baysor_segmentation.transcripts
   ch_baysor_config       = wf_baysor_segmentation.config
+
+  wf_xenium_ranger = XeniumRanger(
+    ch_baysor_segmentation,
+    ch_xenium_output
+  )
 
 
   // Create a report

@@ -1,8 +1,12 @@
 .directory
 singularity/
 work/
-data/
-results/
-transcripts.csv
+test/
 .nextflow*
 .$*
+# pixi environments
+.pixi
+*.egg-info
+pixi.lock
+pixi.toml
+

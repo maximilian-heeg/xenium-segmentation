@@ -2,6 +2,10 @@
 
 A nextflow pipeline for segmentation of 10x Xenium runs. The pipeline consists of the following parts:
 
+## Update v0.3.1:  November 2024
+
+- New step in the pipeline to run xenium ranger with the new segmentation to allow of exploration of the data using Xenium Explorer (This automatically removes cells with less than 3 transcripts)
+
 ## Update v0.3:  June 2024
 
 The pipeline has been adjusted to use the files generated from Xenium running software version 3. The main changes are:
@@ -25,7 +29,7 @@ The pipeline has been adjusted to use the files generated from Xenium running so
 The pipeline requires a working installation of [nextflow](https://www.nextflow.io/). Further, it uses [singularity/apptainer](https://apptainer.org/) to run the scripts in reproducible environments.
 Run the pipeline with:
 
-    nextflow run maximilian-heeg/xenium-segmentation -r v0.3 --xenium_path PATH_TO_XENIUM_OUTOUT
+    nextflow run maximilian-heeg/xenium-segmentation -r v0.3.1 --xenium_path PATH_TO_XENIUM_OUTOUT
 
 ### Parameters
 
@@ -134,18 +138,13 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     merge.iou_threshold = 0.2
 
     /*********************************
-    Report
+    Xenium Ranger
     *********************************/
-    // Width in px of the boundary plot
-    report.width = 1800
-    // Height in px of the boundary plot
-    report.height = 1600
-    // X offset in px of the FOV that is beeing used for 
-    // the plot (-1: center FOV)
-    report.x_offset = -1
-    // y offset in px of the FOV that is beeing used for 
-    // the plot (-1: center FOV)
-    report.y_offset = -1
+    // alpha value for alphashape calculation.
+    // this is used to calcuate the boundaries of the cells based
+    // on the transcripts
+    xeniumranger.alpha = 0.05
+
 
 
 These parameters can either be changed by adding the parameters to the command (`--baysor.min_molecules_per_cell 60`) or by creating a `nextflow.config` file within the working directory.
