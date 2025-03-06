@@ -177,3 +177,5 @@ process {
 ### Troubleshooting
 
 Since Nextflow version 23.07.0, nextflow no longer mounts the home directory when launching a Singularity container. This can cause some errors with the cache directories in python scripts, but can be fixed by setting `export NXF_SINGULARITY_HOME_MOUNT=true`.
+
+This also seems to fix other issues, that have occured when running the pipeline (see https://github.com/maximilian-heeg/xenium-segmentation/issues/9#issue-2820239791).
