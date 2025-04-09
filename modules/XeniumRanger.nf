@@ -12,7 +12,7 @@ process prepareInput {
     output:
         path 'ranger_transcripts.csv', emit: transcripts
         path 'output.geojson', emit: polygons
-    
+
     """
         python script.py \
             --input input.csv \
@@ -31,7 +31,7 @@ process runXeniumRanger {
     errorStrategy 'retry'
     maxRetries 3
 
-    input: 
+    input:
         path "xenium_output"
         path "transcripts.csv"
         path "polygons.geojson"
@@ -39,12 +39,12 @@ process runXeniumRanger {
     output:
         path "xenium-baysor/outs/*"
 
-    publishDir "$params.outdir", 
+    publishDir "$params.outdir",
         mode: 'copy',
         overwrite: true,
-        saveAs: { filename -> 
+        saveAs: { filename ->
             def relativePath = filename.toString() - "xenium-baysor/outs/"
-            return "xenium_explorer/${relativePath}"
+            return "${relativePath}"
         }
 
     """
@@ -61,12 +61,12 @@ process runXeniumRanger {
 
 
 workflow XeniumRanger {
-    take: 
+    take:
         ch_baysor_segmentation
         ch_xenium_output
 
-    main: 
-    
+    main:
+
         rangerInput = prepareInput(
              Channel.fromPath("$baseDir/scripts/prepare_input_xenium_ranger.py"),
              ch_baysor_segmentation

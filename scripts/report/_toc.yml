@@ -1,5 +1,0 @@
-format: jb-book
-root: diagnostics
-chapters:
-- file: baysor_config
-- file: parameter

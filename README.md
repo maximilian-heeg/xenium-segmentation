@@ -2,6 +2,15 @@
 
 A nextflow pipeline for segmentation of 10x Xenium runs. The pipeline consists of the following parts:
 
+
+## Update v0.4.0
+
+Added option `segmentation_method` to choose between instanseg and baysor. Instanseg segmentation is based on the images from the multimodal segmentation.
+
+## Update v0.3.2:
+
+- Update XeniumRanger to v3.1.0
+
 ## Update v0.3.1:  November 2024
 
 - New step in the pipeline to run xenium ranger with the new segmentation to allow of exploration of the data using Xenium Explorer (This automatically removes cells with less than 3 transcripts)
@@ -36,28 +45,28 @@ Run the pipeline with:
 Many parameters can be manually set (and might need to be adjusted for best reuslts.)
 
     /*********************************
-    Input and Output. 
-    *********************************/ 
+    Input and Output.
+    *********************************/
     // The folder pointing towards the xenium results
     xenium_path = null
         // Path to where the final csv should be saved.
     outdir = 'results'
-    
+
     /*********************************
     Tile creation
     *********************************/
     // The width of a tile
-    tile.width = 4000 
+    tile.width = 4000
     // The height of a tile
     tile.height = 4000
-    // The overlap between titles. The next tile with start at x + width - overlap, 
+    // The overlap between titles. The next tile with start at x + width - overlap,
     // or y + height - overlap
     tile.overlap = 200
-    // The minimum Q-Score to pass filtering. 
+    // The minimum Q-Score to pass filtering.
     tile.qv = 20
     // The minimum number of transcripts per tile. This is important
     // because baysor cannot work, if there are too few transcripts.
-    // If the minimal number is not met in a tile, it will be expanded by `overlap` 
+    // If the minimal number is not met in a tile, it will be expanded by `overlap`
     // in all fofur directions until the criterion is met.
     tile.minimal_transcripts = 10000
 
@@ -68,15 +77,15 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // Minimal number of molecules for a cell to be considered as
     // real. It's an important parameter, as it's used to infer
     // several other parameters. Overrides the config value.
-    // If set to -1, the pipeline will calcuate the median transcripts per cell based 
+    // If set to -1, the pipeline will calcuate the median transcripts per cell based
     // on the 10x segmentation and use that value as min_molecules_per_cell
     baysor.min_molecules_per_cell = -1
 
-    // If min_molecules_per_cell should be estimated, this values defines the fraction of 
+    // If min_molecules_per_cell should be estimated, this values defines the fraction of
     // the median transcripts per cell that will be set as min_molecules_per_cell
     baysor.min_molecules_per_cell_fraction = 0.75
 
-    // Minimal number of molecules in a segmented region, required for this region to be 
+    // Minimal number of molecules in a segmented region, required for this region to be
     // considered as a possible cell.
     // 0: min_molecules_per_cell / 4 (Baysor default)
     // string ended with '%' to set it relative to min_molecules_per_cell
@@ -89,7 +98,7 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     baysor.scale = -1.0
 
     // Standard deviation of scale across cells. Can be either number, which
-    // means absolute value of the std, or string ended with "%" to set it 
+    // means absolute value of the std, or string ended with "%" to set it
     // relative to scale. Default: "25%"
     baysor.scale_std = "25%"
 
@@ -103,10 +112,10 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // values in [0.2-0.7] allow flexibility for the algorithm.
     baysor.prior_segmentation_confidence = 0.5
 
-    // Comma-separated list of nuclei-specific genes. If provided, 
+    // Comma-separated list of nuclei-specific genes. If provided,
     // `cyto-genes` has to be set, as well.
     nuclei_genes = ""
-    
+
     // Comma-separated list of cytoplasm-specific genes. If provided,
     // `nuclei-genes` has to be set, as well.
     cyto_genes = ""
@@ -115,25 +124,25 @@ Many parameters can be manually set (and might need to be adjusted for best reus
     // during segmentation. Example: 'Blank*,MALAT1'
     baysor.exclude_genes = ""
 
-    // new-component-weight is proportional to the probability of 
-    // generating a new cell for a molecule, instead of assigning 
-    // it to one of the existing cells. More precisely, the probability 
-    // to assign a molecule to a particular cell linearly depends on 
+    // new-component-weight is proportional to the probability of
+    // generating a new cell for a molecule, instead of assigning
+    // it to one of the existing cells. More precisely, the probability
+    // to assign a molecule to a particular cell linearly depends on
     // the number of molecules, already assigned to this cell. And this
     // parameter is used as the number of molecules for a cell, which is
     // just generated for this new molecule. The algorithm is robust to
     // small changes in this parameter. And normally values in the range
     // of 0.1-0.9 should work fine. Smaller values would lead to slower
-    // convergence of the algorithm, while larger values force the 
-    // emergence of a large number of small cells on each iteration, 
-    // which can produce noise in the result. In general, the default 
+    // convergence of the algorithm, while larger values force the
+    // emergence of a large number of small cells on each iteration,
+    // which can produce noise in the result. In general, the default
     // value should work well.
     baysor.new_component_weight = 0.2
 
     /*********************************
     Merging
     *********************************/
-    // Threshold for stitching. If the IOU for two cells is greater than 
+    // Threshold for stitching. If the IOU for two cells is greater than
     // the threshold, they will be merged
     merge.iou_threshold = 0.2
 
@@ -159,9 +168,9 @@ params {
 ### Executors
 
 > In the Nextflow framework architecture, the executor is the component that determines the system where a pipeline process is run and supervises its execution.
-> 
+>
 > The executor provides an abstraction between the pipeline processes and the underlying execution system. This allows you to write the pipeline functional logic independently from the actual processing platform.
-> 
+>
 > In other words, you can write your pipeline script once and have it running on your computer, a cluster resource manager, or the cloud — simply change the executor definition in the Nextflow configuration file.
 
 Again, you can set an executor by modifying the `nextflow.config`.

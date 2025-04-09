@@ -41,7 +41,7 @@ process runBaysor {
     cpus 8
     // Calcutelate the required memory dynamically based on the number of transcripts
     // These values are estimates from the benchmarking that I did.
-    memory { 10.GB + (1.GB * Math.round(TRANSCRIPTS.toInteger()  / 1000000 * 20) *  task.attempt ) } 
+    memory { 10.GB + (1.GB * Math.round(TRANSCRIPTS.toInteger()  / 1000000 * 20) *  task.attempt ) }
     time { 12.hour * task.attempt }
     errorStrategy 'retry'
     maxRetries 3
@@ -67,7 +67,6 @@ process mergeTiles {
     cpus 8
     memory { 10.GB * task.attempt }
     time { 2.hour * task.attempt }
-    publishDir "$params.outdir", mode: 'copy', overwrite: true
     input:
         path "*transcripts.csv"
     output:
@@ -91,7 +90,7 @@ workflow Baysor {
     take:
         ch_xenium_output
         ch_nuclear_segmentation
-    
+
     main:
         ch_baysor_config = BaysorConfig(ch_xenium_output)
 
@@ -105,7 +104,7 @@ workflow Baysor {
             | mergeTiles
 
 
-    emit: 
+    emit:
         transcripts  = ch_baysor_segmentation
         config       = ch_baysor_config
 

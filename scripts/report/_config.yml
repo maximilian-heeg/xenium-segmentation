@@ -1,7 +1,0 @@
-title: Segmentation diagnostics
-author: Maximilian Heeg
-logo: segmentation.svg
-execute:
-  execute_notebooks: off
-  timeout: -1
-
