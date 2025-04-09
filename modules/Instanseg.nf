@@ -4,8 +4,8 @@ process runInstanseg {
     memory { 20.GB * task.attempt }
     time { 4.hour * task.attempt }
     errorStrategy 'retry'
-    maxRetries 1
-    containerOptions '--contain -B /tmp:/tmp --env INSTANSEG_BIOIMAGEIO_PATH=/tmp/'
+    maxRetries 3
+    containerOptions '--contain -B /tmp:/tmp --env INSTANSEG_BIOIMAGEIO_PATH=/tmp/ --nv'
     input:
         path 'xenium'
         path 'script.py'
@@ -25,7 +25,7 @@ process runXeniumRanger {
     memory { 40.GB * task.attempt }
     time { 4.hour * task.attempt }
     errorStrategy 'retry'
-    maxRetries 0
+    maxRetries 3
 
     input:
         path "xenium_output"
