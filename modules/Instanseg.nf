@@ -61,7 +61,7 @@ workflow Instanseg {
 
         ch_instanseg = runInstanseg(
             ch_xenium_output,
-            Channel.fromPath("scripts/run_instanseg.py"),
+            Channel.fromPath("$baseDir/scripts/run_instanseg.py"),
         )
 
         runXeniumRanger(
